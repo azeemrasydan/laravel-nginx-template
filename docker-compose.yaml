@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  web:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - laravel-app:/var/www/html
+      - ./docker-compose/nginx:/etc/nginx/conf.d/
+    depends_on:
+      - app
+    networks:
+      - laravel
+
+  app:
+    build:
+      context: .
+      dockerfile: web.dockerfile
+    volumes:
+      - laravel-app:/var/www/html
+    networks:
+      - laravel
+
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: laravel_db
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - laravel
+
+networks:
+  laravel:
+    driver: bridge
+
+volumes:
+  laravel-app:
+  mysql-data:
